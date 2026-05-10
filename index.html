@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>装修管理平台 · 悦望名邸</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#faf9f7;--bg2:#f2f0eb;--bg3:#e8e5de;--card:#fff;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --green:#2d6a1f;--green-bg:#eaf3de;--green-mid:#639922;
+  --blue:#1452a0;--blue-bg:#e4eef9;
+  --amber:#7a4500;--amber-bg:#faeeda;
+  --red:#991f1f;--red-bg:#fce8e8;
+  --purple:#4a38a0;--purple-bg:#eeedfe;
+  --teal:#0e6b52;--teal-bg:#e1f5ee;
+  --gray:#5a5a5a;--gray-bg:#f1efe8;
+  --r:8px;--rl:14px;
+  --shadow:0 1px 4px rgba(0,0,0,0.07),0 0 0 0.5px rgba(0,0,0,0.06);
+}
+body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+
+/* ── Top nav ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;}
+.topbar-inner{max-width:1060px;margin:0 auto;display:flex;align-items:center;gap:0;}
+.app-title{font-size:15px;font-weight:700;padding:16px 0;margin-right:32px;white-space:nowrap;}
+.app-sub{font-size:11px;color:var(--text3);font-weight:400;display:block;}
+.main-tabs{display:flex;gap:0;}
+.main-tab{padding:18px 18px;font-size:13px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;}
+.main-tab:hover{color:var(--text);}
+.main-tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:500;}
+
+/* ── Content ── */
+.content{max-width:1060px;margin:0 auto;padding:24px;}
+.page{display:none;}.page.active{display:block;}
+
+/* ── Metrics row ── */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.metric{background:var(--card);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--shadow);}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:5px;}
+.metric-value{font-size:20px;font-weight:600;}
+.mv-ok{color:var(--green);}.mv-bad{color:var(--red);}.mv-warn{color:var(--amber);}
+
+/* ── Progress bar ── */
+.pbar-wrap{background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;margin:6px 0;}
+.pbar{height:100%;border-radius:4px;transition:width .4s;}
+
+/* ── Card ── */
+.card{background:var(--card);border-radius:var(--rl);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.card-pad{padding:16px 20px;}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{font-size:11px;font-weight:500;color:var(--text3);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg);}
+
+/* ── Badges ── */
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500;white-space:nowrap;}
+.bd{background:var(--green-bg);color:var(--green);}
+.bp{background:var(--blue-bg);color:var(--blue);}
+.bn{background:var(--gray-bg);color:var(--gray);}
+.bo{background:var(--red-bg);color:var(--red);}
+.bw{background:var(--amber-bg);color:var(--amber);}
+.bar{background:var(--green-bg);color:var(--green);}
+.btr{background:var(--amber-bg);color:var(--amber);}
+.bor{background:var(--blue-bg);color:var(--blue);}
+.bno{background:var(--gray-bg);color:var(--gray);}
+
+/* ── Add row ── */
+.add-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:12px 0 0;border-top:1px solid var(--border);margin-top:10px;}
+.add-row input,.add-row select,.ar-inp,.ar-sel{font-size:13px;padding:6px 9px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text);height:34px;outline:none;}
+.add-row input:focus,.add-row select:focus,.ar-inp:focus{border-color:var(--green);}
+.fn{flex:2;min-width:80px;}
+.btn{height:34px;padding:0 14px;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);background:var(--card);color:var(--text);cursor:pointer;white-space:nowrap;transition:background .12s;}
+.btn:hover{background:var(--bg2);}
+.btn-pri{background:var(--text);color:var(--card);border-color:var(--text);}
+.btn-pri:hover{opacity:.85;}
+.btn-sm{height:28px;padding:0 9px;font-size:12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--text2);cursor:pointer;}
+.btn-sm:hover{background:var(--bg3);color:var(--text);}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;}
+.del-btn:hover{background:var(--red-bg);color:var(--red);}
+
+/* ── Alert ── */
+.alert{border-radius:var(--r);padding:10px 14px;margin-bottom:10px;font-size:13px;}
+.alert-d{background:var(--red-bg);color:var(--red);}
+.alert-w{background:var(--amber-bg);color:var(--amber);}
+
+/* ── Photo modal ── */
+.mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.mask.open{display:flex;}
+.modal{background:var(--card);border-radius:var(--rl);padding:20px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.modal-title{font-size:15px;font-weight:600;}
+.modal-x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:8px;margin-bottom:12px;}
+.pthumb-wrap{position:relative;}
+.pthumb{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--border);cursor:pointer;}
+.pdel{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.padd{width:100%;aspect-ratio:1;border-radius:var(--r);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg2);color:var(--text3);font-size:22px;gap:3px;}
+.padd:hover{background:var(--bg3);}
+.padd span{font-size:11px;}
+
+/* ── Log ── */
+.log-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.av-me{background:var(--green-bg);color:var(--green);}
+.av-dad{background:var(--blue-bg);color:var(--blue);}
+.av-mom{background:#fbeaf0;color:#993556;}
+.log-body{flex:1;min-width:0;}
+.log-text{font-size:13px;line-height:1.6;word-break:break-all;}
+.log-meta{font-size:11px;color:var(--text3);margin-top:3px;}
+.log-photos{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.lph{width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;}
+textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text);resize:vertical;min-height:60px;font-family:inherit;outline:none;}
+textarea:focus{border-color:var(--green);}
+.msel{display:flex;gap:6px;}
+.mbtn{padding:4px 13px;font-size:12px;border:1px solid var(--border2);border-radius:999px;background:var(--card);color:var(--text2);cursor:pointer;}
+.mbtn.sel{background:var(--text);color:var(--card);border-color:var(--text);}
+
+/* ── Export ── */
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.ecard{border:1px solid var(--border);border-radius:var(--rl);padding:16px;cursor:pointer;transition:background .12s;}
+.ecard:hover{background:var(--bg2);}
+.eicon{font-size:24px;margin-bottom:6px;}
+.etitle{font-size:14px;font-weight:600;margin-bottom:3px;}
+.edesc{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* ── Lightbox ── */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center;cursor:zoom-out;}
+.lb.open{display:flex;}
+.lb img{max-width:92vw;max-height:88vh;border-radius:var(--r);}
+
+/* ── GUIDE page ── */
+.guide-layout{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start;}
+.guide-nav{position:sticky;top:72px;}
+.gn-phase{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:8px 10px 3px;}
+.gn-item{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s;text-decoration:none;}
+.gn-item:hover{background:var(--bg2);color:var(--text);}
+.gn-item.active-nav{background:var(--green-bg);color:var(--green);font-weight:500;}
+.gn-num{width:20px;height:20px;border-radius:50%;background:var(--bg3);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gn-item.active-nav .gn-num{background:var(--green);color:#fff;}
+
+/* Phase sections */
+.phase-sec{margin-bottom:36px;}
+.phase-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--border);}
+.ph-icon{width:42px;height:42px;border-radius:var(--rl);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ph-title{font-size:18px;font-weight:700;}
+.ph-desc{font-size:12px;color:var(--text2);margin-top:2px;}
+.ph-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:500;margin-left:auto;white-space:nowrap;}
+
+/* Step cards in guide */
+.step-card{background:var(--card);border-radius:var(--rl);box-shadow:var(--shadow);margin-bottom:12px;border:1px solid var(--border);}
+.step-hdr{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;}
+.step-hdr:hover{background:var(--bg);}
+.step-num-badge{width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-title-col{flex:1;min-width:0;}
+.step-title{font-size:14px;font-weight:600;}
+.step-tagline{font-size:12px;color:var(--text3);margin-top:2px;}
+.step-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.tag{font-size:11px;padding:2px 7px;border-radius:999px;font-weight:500;}
+.t-time{background:var(--blue-bg);color:var(--blue);}
+.t-warn{background:var(--red-bg);color:var(--red);}
+.t-tip{background:var(--teal-bg);color:var(--teal);}
+.t-money{background:var(--amber-bg);color:var(--amber);}
+.t-diy{background:var(--green-bg);color:var(--green);}
+.step-toggle{color:var(--text3);font-size:16px;margin-top:2px;transition:transform .2s;flex-shrink:0;}
+.step-toggle.open{transform:rotate(180deg);}
+.step-body-wrap{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+.step-body-wrap.open{display:block;}
+
+/* Step body blocks */
+.blk{margin-top:14px;}
+.blk-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+.tip-box{background:var(--teal-bg);border-radius:var(--r);padding:10px 13px;font-size:13px;color:var(--teal);line-height:1.7;}
+.warn-box{background:var(--red-bg);border-radius:var(--r);padding:10px 13px;font-size:13px;color:var(--red);line-height:1.7;}
+.info-box{background:var(--blue-bg);border-radius:var(--r);padding:10px 13px;font-size:13px;color:var(--blue);line-height:1.7;}
+.amb-box{background:var(--amber-bg);border-radius:var(--r);padding:10px 13px;font-size:13px;color:var(--amber);line-height:1.7;}
+.kv-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.kv-tbl td{padding:6px 9px;border-bottom:1px solid var(--border);vertical-align:top;}
+.kv-tbl td:first-child{font-weight:500;color:var(--text2);width:36%;white-space:nowrap;}
+.kv-tbl tr:last-child td{border-bottom:none;}
+
+/* Editable checklist */
+.ecl{list-style:none;}
+.ecl-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;group:true;}
+.ecl-item:last-child{border-bottom:none;}
+.ecl-check{width:16px;height:16px;border:1px solid var(--border2);border-radius:3px;flex-shrink:0;margin-top:2px;cursor:pointer;appearance:none;-webkit-appearance:none;position:relative;}
+.ecl-check:checked{background:var(--green);border-color:var(--green);}
+.ecl-check:checked::after{content:'✓';position:absolute;color:#fff;font-size:10px;font-weight:700;top:-1px;left:1px;}
+.ecl-text{flex:1;outline:none;background:transparent;border:none;font-size:13px;font-family:inherit;color:var(--text);line-height:1.6;cursor:text;resize:none;padding:0;}
+.ecl-text:focus{background:var(--bg2);border-radius:4px;padding:1px 4px;}
+.ecl-del{background:none;border:none;color:transparent;cursor:pointer;font-size:13px;padding:0 3px;border-radius:3px;flex-shrink:0;transition:color .1s;}
+.ecl-item:hover .ecl-del{color:var(--text3);}
+.ecl-del:hover{color:var(--red)!important;background:var(--red-bg);}
+.add-item-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
+.add-item-inp{flex:1;font-size:13px;padding:5px 9px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text);outline:none;}
+.add-item-inp:focus{border-color:var(--green);}
+
+/* Phase colors */
+.ph1 .ph-icon{background:var(--blue-bg);}
+.ph1 .ph-badge{background:var(--blue-bg);color:var(--blue);}
+.ph1 .step-num-badge{background:var(--blue-bg);color:var(--blue);}
+.ph2 .ph-icon{background:var(--amber-bg);}
+.ph2 .ph-badge{background:var(--amber-bg);color:var(--amber);}
+.ph2 .step-num-badge{background:var(--amber-bg);color:var(--amber);}
+.ph3 .ph-icon{background:var(--red-bg);}
+.ph3 .ph-badge{background:var(--red-bg);color:var(--red);}
+.ph3 .step-num-badge{background:var(--red-bg);color:var(--red);}
+.ph4 .ph-icon{background:var(--teal-bg);}
+.ph4 .ph-badge{background:var(--teal-bg);color:var(--teal);}
+.ph4 .step-num-badge{background:var(--teal-bg);color:var(--teal);}
+.ph5 .ph-icon{background:var(--purple-bg);}
+.ph5 .ph-badge{background:var(--purple-bg);color:var(--purple);}
+.ph5 .step-num-badge{background:var(--purple-bg);color:var(--purple);}
+.ph6 .ph-icon{background:var(--green-bg);}
+.ph6 .ph-badge{background:var(--green-bg);color:var(--green);}
+.ph6 .step-num-badge{background:var(--green-bg);color:var(--green);}
+
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.tbtn{padding:6px 13px;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);background:var(--card);color:var(--text2);cursor:pointer;}
+.tbtn:hover{background:var(--bg2);}
+
+.success-msg{color:var(--green);font-size:13px;margin-top:10px;}
+
+@media(max-width:680px){
+  .guide-layout{grid-template-columns:1fr;}
+  .guide-nav{position:static;display:flex;flex-wrap:wrap;gap:4px;}
+  .metrics{grid-template-columns:1fr 1fr;}
+  .egrid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="app-title">悦望名邸装修管理<span class="app-sub">五层排屋 · 162㎡ · 半包</span></div>
+    <div class="main-tabs">
+      <button class="main-tab active" onclick="mainSw('budget')">预算</button>
+      <button class="main-tab" onclick="mainSw('payment')">付款提醒</button>
+      <button class="main-tab" onclick="mainSw('progress')">施工进度</button>
+      <button class="main-tab" onclick="mainSw('materials')">材料采购</button>
+      <button class="main-tab" onclick="mainSw('log')">沟通记录</button>
+      <button class="main-tab" onclick="mainSw('guide')">装修流程</button>
+      <button class="main-tab" onclick="mainSw('export')">导出</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══ 预算 ══ -->
+<div id="page-budget" class="page active">
+  <div class="metrics" id="BM"></div>
+  <div class="pbar-wrap"><div class="pbar" id="BPBAR"></div></div>
+  <p style="font-size:12px;color:var(--text3);margin-bottom:14px" id="BPTXT"></p>
+  <div class="card card-pad">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:28%">分类</th><th>预算</th><th>已付</th><th>差额</th><th>状态</th><th style="width:36px"></th></tr></thead>
+        <tbody id="BTBODY"></tbody>
+      </table>
+    </div>
+    <div class="add-row">
+      <input class="fn" id="BN" placeholder="分类名称"/>
+      <input id="BB" placeholder="预算 ¥" type="number" style="width:100px"/>
+      <input id="BP" placeholder="已付 ¥" type="number" style="width:100px"/>
+      <button class="btn" onclick="addB()">+ 添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 付款提醒 ══ -->
+<div id="page-payment" class="page">
+  <div id="PALERTS"></div>
+  <div class="card card-pad">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:22%">付款事项</th><th>金额</th><th>截止日期</th><th>备注</th><th>状态</th><th style="width:110px"></th></tr></thead>
+        <tbody id="PTBODY"></tbody>
+      </table>
+    </div>
+    <div class="add-row">
+      <input class="fn" id="PN" placeholder="付款事项"/>
+      <input id="PA" placeholder="金额 ¥" type="number" style="width:90px"/>
+      <input id="PD" type="date" style="width:138px"/>
+      <input id="PR" placeholder="备注" style="width:110px"/>
+      <button class="btn" onclick="addP()">+ 添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 施工进度 ══ -->
+<div id="page-progress" class="page">
+  <div class="metrics" id="PGM"></div>
+  <div class="card card-pad">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:22%">施工项目</th><th>负责方</th><th>计划完成</th><th>状态</th><th>照片</th><th style="width:36px"></th></tr></thead>
+        <tbody id="PGTBODY"></tbody>
+      </table>
+    </div>
+    <div class="add-row">
+      <input class="fn" id="PGN" placeholder="施工项目"/>
+      <input id="PGW" placeholder="负责方" style="width:90px"/>
+      <input id="PGD" type="date" style="width:138px"/>
+      <select id="PGS" style="width:90px"><option value="pending">待开始</option><option value="progress">进行中</option><option value="done">已完成</option></select>
+      <button class="btn" onclick="addPG()">+ 添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 材料采购 ══ -->
+<div id="page-materials" class="page">
+  <div class="metrics" id="MM"></div>
+  <div class="card card-pad">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:16%">材料</th><th>品牌/规格</th><th>数量</th><th>金额</th><th>到货</th><th>照片</th><th style="width:36px"></th></tr></thead>
+        <tbody id="MTBODY"></tbody>
+      </table>
+    </div>
+    <div class="add-row">
+      <input class="fn" id="MN" placeholder="材料名称"/>
+      <input id="MS" placeholder="品牌/规格" style="width:100px"/>
+      <input id="MQ" placeholder="数量" style="width:58px"/>
+      <input id="MP" placeholder="金额¥" type="number" style="width:80px"/>
+      <select id="MST" style="width:90px"><option value="notyet">未下单</option><option value="ordered">已下单</option><option value="transit">运输中</option><option value="arrived">已到货</option></select>
+      <button class="btn" onclick="addM()">+ 添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 沟通记录 ══ -->
+<div id="page-log" class="page">
+  <div class="card card-pad">
+    <div id="LOGLIST"></div>
+    <div style="border-top:1px solid var(--border);margin-top:12px;padding-top:14px">
+      <textarea id="LOGTXT" placeholder="记录与工长、设计师沟通内容，或家庭决策..."></textarea>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:9px;flex-wrap:wrap">
+        <div class="msel" id="MSEL">
+          <button class="mbtn sel" data-who="我" onclick="selM(this)">我</button>
+          <button class="mbtn" data-who="爸" onclick="selM(this)">爸</button>
+          <button class="mbtn" data-who="妈" onclick="selM(this)">妈</button>
+        </div>
+        <label class="btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+          📷 附照片<input type="file" accept="image/*" multiple style="display:none" id="LOGPHI" onchange="previewLogPh(event)"/>
+        </label>
+        <span id="LOGPHC" style="font-size:12px;color:var(--text3)"></span>
+      </div>
+      <div id="LOGPHPREV" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px"></div>
+      <button class="btn btn-pri" onclick="addLog()" style="margin-top:11px">记录</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 装修流程 ══ -->
+<div id="page-guide" class="page">
+  <div class="toolbar">
+    <button class="tbtn" onclick="expandAll()">全部展开</button>
+    <button class="tbtn" onclick="collapseAll()">全部收起</button>
+    <span style="font-size:12px;color:var(--text3);padding:6px 4px">点击条目文字可直接编辑；每步下方可新增自定义条目</span>
+  </div>
+  <div class="guide-layout">
+    <div class="guide-nav" id="GNAV"></div>
+    <div id="GUIDE_MAIN"></div>
+  </div>
+</div>
+
+<!-- ══ 导出 ══ -->
+<div id="page-export" class="page">
+  <div class="card card-pad">
+    <p style="font-size:13px;color:var(--text2)">生成可下载文件，适合存档或在 Excel 中打开</p>
+    <div class="egrid">
+      <div class="ecard" onclick="expBudget()"><div class="eicon">📊</div><div class="etitle">预算报表 CSV</div><div class="edesc">所有分类预算、已付、超支情况</div></div>
+      <div class="ecard" onclick="expPayment()"><div class="eicon">💳</div><div class="etitle">付款节点 CSV</div><div class="edesc">付款事项、截止日期、状态</div></div>
+      <div class="ecard" onclick="expProgress()"><div class="eicon">🏗️</div><div class="etitle">施工进度 CSV</div><div class="edesc">项目、负责方、完成状态</div></div>
+      <div class="ecard" onclick="expFull()"><div class="eicon">📄</div><div class="etitle">综合报告 HTML</div><div class="edesc">完整装修报告，可打印或分享</div></div>
+    </div>
+    <p class="success-msg" id="EXPMSG"></p>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- Photo modal -->
+<div class="mask" id="PH-MASK" onclick="closeMask('PH-MASK',event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <span class="modal-title" id="PH-TITLE">照片备注</span>
+      <button class="modal-x" onclick="closeMask('PH-MASK')">×</button>
+    </div>
+    <div class="pgrid" id="PH-GRID"></div>
+    <label class="btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+      + 添加照片<input type="file" accept="image/*" multiple style="display:none" id="PH-FILE" onchange="uploadPhotos(event)"/>
+    </label>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="LB" onclick="document.getElementById('LB').classList.remove('open')">
+  <img id="LB-IMG" src="" alt=""/>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let NID=500, CUR=null, selWho='我', logPhs=[];
+
+const S={
+  budget:[
+    {id:1,name:'硬装施工（人工+辅料）',budget:350000,paid:120000},
+    {id:2,name:'水电改造',budget:65000,paid:65000},
+    {id:3,name:'地板瓷砖',budget:80000,paid:0},
+    {id:4,name:'门窗定制',budget:55000,paid:32000},
+    {id:5,name:'卫浴洁具',budget:45000,paid:18000},
+    {id:6,name:'橱柜定制',budget:60000,paid:0},
+    {id:7,name:'家具软装',budget:150000,paid:0},
+    {id:8,name:'应急预留金',budget:80000,paid:0},
+  ],
+  payments:[
+    {id:10,name:'硬装首付款',amount:90000,dueDate:'2025-03-01',note:'合同签订3日内',paid:true},
+    {id:11,name:'水电验收款',amount:65000,dueDate:'2025-04-15',note:'验收合格后付清',paid:true},
+    {id:12,name:'泥工进场款',amount:50000,dueDate:'2025-05-20',note:'贴砖开始前',paid:false},
+    {id:13,name:'橱柜定金',amount:18000,dueDate:'2025-05-10',note:'复尺后付款',paid:false},
+    {id:14,name:'木门尾款',amount:20000,dueDate:'2025-06-15',note:'安装完成后',paid:false},
+    {id:15,name:'硬装尾款',amount:175000,dueDate:'2025-08-01',note:'竣工验收合格后',paid:false},
+  ],
+  progress:[
+    {id:20,name:'拆除旧墙/门洞改造',worker:'施工队',date:'2025-03-10',status:'done',photos:[]},
+    {id:21,name:'水电改造（全5层）',worker:'水电工',date:'2025-04-01',status:'done',photos:[]},
+    {id:22,name:'防水施工+闭水试验',worker:'施工队',date:'2025-04-10',status:'done',photos:[]},
+    {id:23,name:'泥工贴砖',worker:'施工队',date:'2025-05-20',status:'progress',photos:[]},
+    {id:24,name:'木工吊顶/包立管',worker:'木工师傅',date:'2025-06-10',status:'pending',photos:[]},
+    {id:25,name:'油漆（腻子+乳胶漆）',worker:'油漆工',date:'2025-06-30',status:'pending',photos:[]},
+    {id:26,name:'橱柜安装',worker:'橱柜商家',date:'2025-07-10',status:'pending',photos:[]},
+    {id:27,name:'室内门安装',worker:'门厂师傅',date:'2025-07-15',status:'pending',photos:[]},
+    {id:28,name:'木地板铺设',worker:'地板商家',date:'2025-07-20',status:'pending',photos:[]},
+    {id:29,name:'灯具/开关安装',worker:'电工',date:'2025-07-25',status:'pending',photos:[]},
+    {id:30,name:'洁具安装',worker:'水工',date:'2025-07-28',status:'pending',photos:[]},
+  ],
+  materials:[
+    {id:40,name:'客厅大板砖',spec:'马可波罗 1200×600',qty:'260㎡',price:52000,status:'ordered',photos:[]},
+    {id:41,name:'卫生间墙砖',spec:'东鹏 300×600',qty:'180㎡',price:18000,status:'ordered',photos:[]},
+    {id:42,name:'实木复合地板',spec:'圣象 E0级 15mm',qty:'320㎡',price:48000,status:'notyet',photos:[]},
+    {id:43,name:'主卫花洒恒温套装',spec:'汉斯格雅',qty:'1套',price:6800,status:'arrived',photos:[]},
+    {id:44,name:'智能马桶（主卫）',spec:'TOTO CW988',qty:'1件',price:4500,status:'arrived',photos:[]},
+    {id:45,name:'普通马桶（其余卫生间）',spec:'箭牌',qty:'3件',price:3600,status:'notyet',photos:[]},
+    {id:46,name:'防水涂料（地下室专用）',spec:'东方雨虹JS-Ⅱ',qty:'30桶',price:5400,status:'transit',photos:[]},
+    {id:47,name:'墙面乳胶漆',spec:'立邦净味超白',qty:'20桶',price:3200,status:'notyet',photos:[]},
+  ],
+  logs:[
+    {id:60,who:'妈',text:'和设计师确认：主卧飘窗改为榻榻米，额外加价8000元，已同意。设计师说5月底出施工图。',date:'2025-05-01',photos:[]},
+    {id:61,who:'我',text:'工长说水电验收通过，地下室防水也做了二次加强，可以开始贴砖。地漏要提前确认位置。',date:'2025-04-28',photos:[]},
+    {id:62,who:'爸',text:'去建材城看了三家木门，最终选华鹤，定制周期45天，预计6月底到货。已付定金8000。',date:'2025-04-20',photos:[]},
+  ]
+};
+
+// ─── Guide Data ───────────────────────────────────────────────────────────────
+// Each step has items[] – each item is {id, text, checked}
+const G=[
+  {phase:'阶段一：前期规划',icon:'📐',color:'ph1',badge:'建议 1～2个月',steps:[
+    {id:'s01',num:1,title:'搞清楚房子的基本情况',tagline:'在任何规划之前，先摸清自己的"底牌"',tags:['⏱ 1～2天','自己做'],items:[
+      {id:'i001',text:'向开发商或物业索取《竣工图》或《水电图》，里面有原始水管、电线走向，后期改水电必须参考',checked:false},
+      {id:'i002',text:'确认房子是否还在保修期内（新房主体结构5年、防水1年）',checked:false},
+      {id:'i003',text:'量出每层各个房间的实际净尺寸（长×宽×高），不能只看户型图标注，误差可达10～20cm',checked:false},
+      {id:'i004',text:'找清楚承重墙的位置：敲击墙体，声音"闷实"的是承重墙，禁止拆除',checked:false},
+      {id:'i005',text:'五层排屋重点：确认楼梯间净高（至少2.1m），楼板厚度（影响隔音），地下室防水情况',checked:false},
+      {id:'i006',text:'查清楚小区装修管理规定：施工时间（一般工作日8:00～18:00）、建筑垃圾处理方式',checked:false},
+      {id:'i007',text:'了解小区电梯尺寸，大件家具（床垫、橱柜）能否走电梯，否则需要吊装',checked:false},
+      {id:'i008',text:'确认物业装修押金金额和退还条件',checked:false},
+      {id:'i009',text:'拍好毛坯照片存档：每层每个房间四面墙+地面+顶面全部拍清楚',checked:false},
+    ]},
+    {id:'s02',num:2,title:'制定装修预算',tagline:'先定钱再定方案，避免越做越贵收不住',tags:['⏱ 3～5天','涉及大额支出'],items:[
+      {id:'i010',text:'全家确定总预算上限，共识一致，不轻易突破',checked:false},
+      {id:'i011',text:'五层排屋半包费用参考：硬装人工+辅料约30～50万；主材约25～45万；软装约15～25万',checked:false},
+      {id:'i012',text:'必须预留总预算10～15%的应急金，隐蔽工程出问题随时要用',checked:false},
+      {id:'i013',text:'按楼层分别列预算：地下室（防水要求高）、一至四层（标准施工）、顶层（屋顶防水+露台）',checked:false},
+      {id:'i014',text:'用装修管理工具记录每笔预算和实际支出，每次付款都要更新',checked:false},
+    ]},
+    {id:'s03',num:3,title:'确定装修风格和家庭需求',tagline:'把脑子里模糊的"喜欢"变成具体可执行的方向',tags:['⏱ 1～2周','全家参与'],items:[
+      {id:'i020',text:'在小红书、Pinterest、住范儿大量收图，家庭成员各自收集后汇总对比',checked:false},
+      {id:'i021',text:'确认主色调（不超过3种）：现代简约推荐白/灰/米色为主',checked:false},
+      {id:'i022',text:'明确"绝对不要"的元素（如不要复杂吊顶、不要深色地板等），这些同样重要',checked:false},
+      {id:'i023',text:'按需求梳理五层功能：地下室（储物/健身/娱乐？）、一层（客餐厅？）、二三层（卧室）、顶层（主卧/露台？）',checked:false},
+      {id:'i024',text:'确认是否有特殊需求：老人无障碍、小孩安全防护、宠物、在家办公',checked:false},
+      {id:'i025',text:'收纳需求评估：衣服、杂物、书籍各有多少，五层排屋收纳规划非常重要',checked:false},
+    ]},
+    {id:'s04',num:4,title:'找设计师出施工图',tagline:'半包模式下，一份好的施工图能帮你省钱且减少返工',tags:['⏱ 2～4周','设计费1.5～5万'],items:[
+      {id:'i030',text:'联系3～5个风格相符的独立设计师，要求看实景照片（非效果图）',checked:false},
+      {id:'i031',text:'面谈时带参考图，观察设计师是否真正理解需求，而不是套模板',checked:false},
+      {id:'i032',text:'确认出图内容：平面布置图、水电图（每层）、立面图、效果图，缺一不可',checked:false},
+      {id:'i033',text:'设计阶段重点确认：每个房间的插座开关位置、灯光方案、收纳设计',checked:false},
+      {id:'i034',text:'五层排屋重点：楼梯设计、每层卫生间位置（是否与楼下卧室叠加需做隔音）',checked:false},
+      {id:'i035',text:'签设计合同，明确出图时间、修改次数、设计师是否驻场配合施工',checked:false},
+    ]},
+    {id:'s05',num:5,title:'去物业办理开工手续',tagline:'合法开工，避免被叫停或扣押金',tags:['⏱ 1～3天','自己去办'],items:[
+      {id:'i040',text:'准备材料：房产证/购房合同复印件、业主身份证复印件、施工队营业执照复印件',checked:false},
+      {id:'i041',text:'到物业填写"装修申请表"，缴纳装修押金，领取施工许可牌（张贴在门口）',checked:false},
+      {id:'i042',text:'了解小区施工时间规定（严格遵守，否则邻居投诉后果严重）',checked:false},
+      {id:'i043',text:'了解建筑垃圾处理规定和收费标准（按方计费，五层排屋垃圾量不小）',checked:false},
+      {id:'i044',text:'询问是否需要为施工人员办理临时门禁卡',checked:false},
+    ]},
+  ]},
+  {phase:'阶段二：找施工团队',icon:'👷',color:'ph2',badge:'建议 2～4周',steps:[
+    {id:'s06',num:6,title:'寻找并筛选施工团队',tagline:'找到靠谱的施工团队是整个装修中最关键的一步',tags:['⏱ 1～2周','重点步骤'],items:[
+      {id:'i050',text:'向同小区已装修的业主打听，在业主群询问，争取上门参观其工地',checked:false},
+      {id:'i051',text:'联系3家以上同时报价，不要只找一家对比',checked:false},
+      {id:'i052',text:'要求看近期同类型（联排/排屋）项目的实景照片和工地，亲眼看工艺细节',checked:false},
+      {id:'i053',text:'五层排屋工程量大，优先选有别墅/排屋施工经验的团队',checked:false},
+      {id:'i054',text:'通过企查查核实公司营业执照真实性',checked:false},
+      {id:'i055',text:'红旗警告：催你快签单、口头承诺不肯写进合同、报价单项目含糊、拒绝看工地',checked:false},
+    ]},
+    {id:'s07',num:7,title:'看懂并签装修合同',tagline:'合同是你最重要的保护，每一条都要看清楚',tags:['⏱ 1周','非常重要','合同金额大'],items:[
+      {id:'i060',text:'施工范围：每一项工程的具体内容和面积必须逐一列明，不能写"水电改造一项"',checked:false},
+      {id:'i061',text:'辅料品牌：水泥、沙子、腻子、乳胶漆品牌型号写进合同，防止偷换次品',checked:false},
+      {id:'i062',text:'工期：明确开工和竣工日期，逾期赔偿条款（通常合同额0.1%/天）',checked:false},
+      {id:'i063',text:'付款节点：首付≤30%，尾款≥10%（尾款是最大筹码，不能提前付清）',checked:false},
+      {id:'i064',text:'增项规则：增项必须业主书面确认后才能施工，且增项单价要在合同中约定',checked:false},
+      {id:'i065',text:'质保期：水电≥5年，防水≥5年，其余施工项目≥1年',checked:false},
+      {id:'i066',text:'验收标准：参照国家标准GB50210，写明验收方式',checked:false},
+    ]},
+    {id:'s08',num:8,title:'开工前交底会议',tagline:'把业主、设计师、工长叫到现场，当面把所有要求说清楚',tags:['⏱ 半天','必须亲自参加'],items:[
+      {id:'i070',text:'参与人：业主+设计师（带完整施工图）+工长，最好水电工长也在场',checked:false},
+      {id:'i071',text:'对照图纸逐间讲解，在墙上用马克笔标出：拆墙位置、门洞位置',checked:false},
+      {id:'i072',text:'在墙上标出所有插座、开关、灯具位置，并拍照留存',checked:false},
+      {id:'i073',text:'确认材料存放区域和建筑垃圾堆放位置',checked:false},
+      {id:'i074',text:'整理"交底纪要"发给工长签字确认，留存备用',checked:false},
+    ]},
+  ]},
+  {phase:'阶段三：硬装施工',icon:'🔨',color:'ph3',badge:'建议 2～4个月',steps:[
+    {id:'s09',num:9,title:'拆除工程',tagline:'第一锤落下去，装修正式开始',tags:['⏱ 3～7天','禁止拆承重墙'],items:[
+      {id:'i080',text:'开工当天到场，拍视频记录拆除前原始状态',checked:false},
+      {id:'i081',text:'现场逐一指定拆除范围，绝不让工人自行判断',checked:false},
+      {id:'i082',text:'五层排屋：重点检查每层楼板是否完好，楼梯间结构不能动',checked:false},
+      {id:'i083',text:'拆除产生的建筑垃圾及时清运，不堵电梯和楼道',checked:false},
+      {id:'i084',text:'拆完后检查：承重墙完好、拆除面积符合方案、无意外损坏',checked:false},
+      {id:'i085',text:'绝对禁止：私自拆除承重墙、承重柱、在楼板随意打洞穿管',checked:false},
+    ]},
+    {id:'s10',num:10,title:'水电改造（全5层）',tagline:'最重要的隐蔽工程，封墙后看不见了，必须认真',tags:['⏱ 10～20天','最重要的隐蔽工程','费用占比大'],items:[
+      {id:'i090',text:'提前画好每层"水电点位图"：开关、插座、灯位、水龙头全部标注',checked:false},
+      {id:'i091',text:'水管材料：使用PPR管（热熔连接，不生锈），冷热水管分开走并包保温棉',checked:false},
+      {id:'i092',text:'水路改造完成后必须做打压测试：0.8～1.0MPa保持30分钟无压降，你必须到场见证并留存照片',checked:false},
+      {id:'i093',text:'电线必须穿管（PVC线管），严禁裸线直埋墙内',checked:false},
+      {id:'i094',text:'大功率电器专线：空调、热水器、烤箱、洗碗机各自单独走一路',checked:false},
+      {id:'i095',text:'五层排屋特别注意：每层都要单独设配电回路，总配电箱容量是否够用',checked:false},
+      {id:'i096',text:'弱电布线：网线（每个房间至少1根cat6）、电视线、门禁对讲线',checked:false},
+      {id:'i097',text:'水电完工封槽前：用手机拍照记录所有管线走向（非常重要！将来打钉要参考）',checked:false},
+      {id:'i098',text:'电路验收：每个插座用验电笔测试，每个开关逐一测试对应灯',checked:false},
+    ]},
+    {id:'s11',num:11,title:'防水工程',tagline:'排屋五层，地下室防水是重中之重',tags:['⏱ 3～7天','排屋重点'],items:[
+      {id:'i100',text:'防水区域：全部卫生间地面+墙面（淋浴区做到顶）、厨房地面、阳台、地下室（必须全做）',checked:false},
+      {id:'i101',text:'地下室防水：地面+四面墙全做，推荐聚氨酯涂膜（防水等级高），条件允许做内外双层',checked:false},
+      {id:'i102',text:'防水涂料至少涂刷两遍，方向垂直交叉，阴角（地面与墙面交接处）加贴防水布',checked:false},
+      {id:'i103',text:'等待48小时干燥后做闭水试验：堵住地漏，注水2～3cm深，保持48小时',checked:false},
+      {id:'i104',text:'闭水试验期间去楼下观察是否渗水，拍照记录测试结果和日期',checked:false},
+      {id:'i105',text:'闭水试验通过后才能贴砖，否则必须重做防水',checked:false},
+      {id:'i106',text:'五层排屋：屋顶露台也要做全面防水+隔热层',checked:false},
+    ]},
+    {id:'s12',num:12,title:'泥工（贴砖、砌墙、抹灰）',tagline:'决定地面和墙面"颜值"的关键工序',tags:['⏱ 20～35天','主材砖需提前购买'],items:[
+      {id:'i110',text:'施工顺序：砌新墙（养护3天）→ 墙面基层处理 → 卫浴墙砖 → 地砖（各区域）→ 楼梯踏步 → 门槛石 → 勾缝',checked:false},
+      {id:'i111',text:'泥工进场前，地砖/墙砖必须已到货，否则工人等料会影响工期',checked:false},
+      {id:'i112',text:'告知工人铺贴方式（正铺/错缝/人字铺）并附参考图，确认砖缝宽度',checked:false},
+      {id:'i113',text:'验收空鼓：用木槌或硬币敲击每块砖，声音空洞的必须返工',checked:false},
+      {id:'i114',text:'验收平整度：用2米靠尺检测，误差不超过3mm',checked:false},
+      {id:'i115',text:'卫生间地面坡度：向地漏方向倾斜，不能积水',checked:false},
+      {id:'i116',text:'五层排屋：楼梯踏步贴砖/石材，需确认防滑槽位置',checked:false},
+    ]},
+    {id:'s13',num:13,title:'木工工程',tagline:'现代简约风木工量不大，但细节决定效果',tags:['⏱ 10～20天'],items:[
+      {id:'i120',text:'现代简约风建议少做木工：能用定制家具替代的尽量替代，工厂精度更高',checked:false},
+      {id:'i121',text:'主要木工项：吊顶（如有灯槽）、卫生间包立管、门套窗套',checked:false},
+      {id:'i122',text:'吊顶验收：表面平整、无接缝痕迹、灯槽尺寸与灯带匹配',checked:false},
+      {id:'i123',text:'板材必须使用E1或E0以上环保等级，让工人出示产品说明书',checked:false},
+      {id:'i124',text:'五层排屋楼梯：楼梯扶手和立柱的木作安装，确认高度和间距符合安全标准',checked:false},
+    ]},
+    {id:'s14',num:14,title:'油漆（墙面乳胶漆）',tagline:'最后一道面子工程，颜色确认最关键',tags:['⏱ 10～15天','上墙前必须做色卡'],items:[
+      {id:'i130',text:'油漆步骤：批腻子2～3遍（每遍干透后打磨）→ 刷底漆 → 刷面漆第一遍 → 修补打磨 → 刷面漆第二遍',checked:false},
+      {id:'i131',text:'颜色确认：在实际墙面刷30×30cm色块，在不同时间和灯光下观察，而不是只看色卡本',checked:false},
+      {id:'i132',text:'白色也分纯白/暖白/冷白/米白，选错了整个空间气质都变了',checked:false},
+      {id:'i133',text:'选净味低VOC乳胶漆（立邦/多乐士/大师美），五层排屋用量大，记得多订10%',checked:false},
+      {id:'i134',text:'验收：墙面平整无刮痕气泡、阴阳角笔直（用手电筒斜照检查）、踢脚线收边干净',checked:false},
+    ]},
+  ]},
+  {phase:'阶段四：主材采购',icon:'🛒',color:'ph4',badge:'贯穿整个施工期',steps:[
+    {id:'s15',num:15,title:'主材采购时间节点',tagline:'什么时候买什么，顺序错了会影响工期',tags:['半包核心任务'],items:[
+      {id:'i140',text:'开工前就要订：定制橱柜（30～45天）、定制衣柜（30～45天）、定制木门（45天）、楼梯定制（30天）',checked:false},
+      {id:'i141',text:'水电完成后买：地砖/墙砖（泥工用）、开关插座面板',checked:false},
+      {id:'i142',text:'泥工完成后买：木地板（铺设需要）、各卫生间地漏（泥工前确认位置）',checked:false},
+      {id:'i143',text:'油漆完成后安装：室内门、地板、踢脚线、灯具、窗帘',checked:false},
+      {id:'i144',text:'最后安装：洁具（马桶、花洒、浴室柜）、厨房水槽、五金配件',checked:false},
+      {id:'i145',text:'五层排屋材料量大，下单前精确计算每层每个区域的用量，统一采购有折扣',checked:false},
+    ]},
+    {id:'s16',num:16,title:'瓷砖选购',tagline:'买错难退，买少有色差，买多浪费',tags:['⏱ 提前2周','预算3～8万'],items:[
+      {id:'i150',text:'按面积×1.1（损耗系数）计算购买量，同一批次下够量，不要分批补货（有色差）',checked:false},
+      {id:'i151',text:'客厅/餐厅推荐大板砖（900×1800或600×1200），空间感更强',checked:false},
+      {id:'i152',text:'卫生间墙砖推荐小白砖或60×120（五层排屋卫生间多，批量采购可谈价）',checked:false},
+      {id:'i153',text:'地下室地面推荐通体砖或防滑仿古砖',checked:false},
+      {id:'i154',text:'到货后立即清点数量，当场检查破损，及时要求补货',checked:false},
+      {id:'i155',text:'每种砖多留5块以上备用（日后修补用，同批次的才不会有色差）',checked:false},
+    ]},
+    {id:'s17',num:17,title:'木地板选购',tagline:'脚感和环保同样重要',tags:['⏱ 泥工完成前订购','预算4～12万'],items:[
+      {id:'i160',text:'五层排屋推荐实木复合地板（15mm以上），兼顾美观和稳定性，不容易变形',checked:false},
+      {id:'i161',text:'环保等级选E0或ENF（无醛）级别',checked:false},
+      {id:'i162',text:'有地暖的楼层必须选"地暖专用"地板',checked:false},
+      {id:'i163',text:'楼梯踏步用石材或专用踏步板（比普通地板耐磨）',checked:false},
+      {id:'i164',text:'地板由商家自己的师傅铺设，不建议让装修队铺（质保责任不清）',checked:false},
+    ]},
+    {id:'s18',num:18,title:'室内门选购',tagline:'每扇门都是空间的"表情"，也是隔音的关键',tags:['⏱ 开工前订购（45天）','预算2～4万'],items:[
+      {id:'i170',text:'开工前测量每个门洞尺寸（宽×高），五层排屋门多，统一款式可批量折扣',checked:false},
+      {id:'i171',text:'确认每扇门的开合方向，不能挡住插座或开关',checked:false},
+      {id:'i172',text:'卫生间门推荐带百叶或下方留缝的，潮气能散发',checked:false},
+      {id:'i173',text:'主卧选实木复合门，隔音填充好，有小孩家庭考虑门上锁具的安全性',checked:false},
+      {id:'i174',text:'安装时间：油漆完成后安装，避免油漆污染门扇',checked:false},
+    ]},
+    {id:'s19',num:19,title:'橱柜选购',tagline:'厨房颜值和功能几乎全靠橱柜',tags:['⏱ 开工前订购（30～45天）','预算4～10万'],items:[
+      {id:'i180',text:'开工前请橱柜公司来量初尺，水电复尺后确定最终方案',checked:false},
+      {id:'i181',text:'柜体板材推荐实木多层板（E1以上），门板推荐哑光烤漆（现代简约）',checked:false},
+      {id:'i182',text:'台面推荐岩板或石英石（厚度20mm以上）',checked:false},
+      {id:'i183',text:'提前确认嵌入式电器（烤箱、蒸箱、洗碗机）尺寸，橱柜做好预留',checked:false},
+      {id:'i184',text:'内部分区：抽屉比层板好用，提前规划锅碗瓢盆收纳需求',checked:false},
+    ]},
+    {id:'s20',num:20,title:'卫浴洁具选购',tagline:'使用频率最高，选好了每天都舒服',tags:['⏱ 泥工完成前确认','预算2～6万'],items:[
+      {id:'i190',text:'马桶最重要参数：坑距（马桶排污口中心到墙面距离），通常200mm或305mm，必须量准',checked:false},
+      {id:'i191',text:'主卫推荐智能马桶（TOTO/科勒），其余卫生间选品牌普通马桶',checked:false},
+      {id:'i192',text:'主卫推荐恒温花洒（防止烫伤），有小孩家庭尤为重要',checked:false},
+      {id:'i193',text:'五层排屋有多个卫生间，统一品牌采购，售后方便',checked:false},
+      {id:'i194',text:'洁具在地砖贴完、墙面油漆完成后安装，安装完成后试水检查是否渗漏',checked:false},
+    ]},
+  ]},
+  {phase:'阶段五：软装收尾',icon:'🛋️',color:'ph5',badge:'建议 1～2个月',steps:[
+    {id:'s21',num:21,title:'灯具选购与安装',tagline:'好的灯光让空间提升一个档次',tags:['⏱ 油漆完成后'],items:[
+      {id:'i200',text:'嵌入式筒灯/射灯：木工阶段提前在石膏板预留开孔位置',checked:false},
+      {id:'i201',text:'卧室推荐无主灯设计（多个筒灯+床头灯），比大吊灯更有氛围感',checked:false},
+      {id:'i202',text:'厨房、卫生间灯具选防水防潮型号（IP44以上）',checked:false},
+      {id:'i203',text:'安装后逐一测试：有无闪烁、色温是否一致、亮度是否够用',checked:false},
+      {id:'i204',text:'确认每个开关控制哪盏灯，与设计图一致',checked:false},
+    ]},
+    {id:'s22',num:22,title:'窗帘 & 遮光方案',tagline:'影响睡眠质量，不要等搬进去再想',tags:['⏱ 提前1个月量尺'],items:[
+      {id:'i210',text:'窗帘盒在木工阶段就要做好（隐藏式导轨最简洁）',checked:false},
+      {id:'i211',text:'卧室推荐遮光+纱帘双层，遮光度95%以上',checked:false},
+      {id:'i212',text:'五层排屋窗户多，让商家上门统一量尺制作，通常有批量折扣',checked:false},
+      {id:'i213',text:'窗帘颜色跟墙面同色系，比墙面深一个色号最安全',checked:false},
+    ]},
+    {id:'s23',num:23,title:'家具采购 & 摆场',tagline:'买家具最容易超预算，提前规划尺寸',tags:['⏱ 油漆完成后','预算10～25万'],items:[
+      {id:'i220',text:'先买大件（沙发、床、餐桌），确认尺寸合适后再配小件',checked:false},
+      {id:'i221',text:'在地上贴胶布模拟家具轮廓感受实际大小，再下单',checked:false},
+      {id:'i222',text:'五层排屋空间大，家具不要买太小，小沙发在大客厅里显空旷',checked:false},
+      {id:'i223',text:'大件家具是否能走电梯，超大件提前安排吊装',checked:false},
+      {id:'i224',text:'家具送货时间：油漆完成后等待至少2周，漆干透后才能送入',checked:false},
+    ]},
+    {id:'s24',num:24,title:'家电安装调试',tagline:'大家电要协调安装时间，空调需要打孔提前安排',tags:['⏱ 硬装完成后'],items:[
+      {id:'i230',text:'空调：最好在油漆前打孔（免得补洞），找品牌官方安装',checked:false},
+      {id:'i231',text:'热水器：燃气热水器需要燃气公司上门，电热水器确认是独立专线',checked:false},
+      {id:'i232',text:'洗碗机：嵌入式橱柜安装时预留位置，需连接上下水',checked:false},
+      {id:'i233',text:'油烟机：确认排烟管走向是否畅通，与外部排烟口连接',checked:false},
+      {id:'i234',text:'全屋网络：每层至少1个网络节点，路由器位置确认，是否需要组mesh网络',checked:false},
+    ]},
+  ]},
+  {phase:'阶段六：验收入住',icon:'✅',color:'ph6',badge:'建议 2～4周',steps:[
+    {id:'s25',num:25,title:'竣工验收（全屋检查）',tagline:'拿着清单逐项检查，付尾款前必须完成',tags:['⏱ 1～2天','付尾款前必须完成'],items:[
+      {id:'i240',text:'水路：打开所有水龙头检查出水，检查下水是否通畅，热水器是否出热水',checked:false},
+      {id:'i241',text:'电路：每个插座用验电笔测试，每个开关逐一测试，空调通电试运行',checked:false},
+      {id:'i242',text:'地面：木槌敲砖检查空鼓，靠尺检查平整度，木地板有无响声起拱',checked:false},
+      {id:'i243',text:'墙面：手电筒斜照检查平整度，阴阳角是否笔直，有无明显色差',checked:false},
+      {id:'i244',text:'门窗：每扇门开关是否顺滑，门缝是否均匀，锁具是否正常',checked:false},
+      {id:'i245',text:'卫生间：冲水检查渗漏，地漏是否通畅，玻璃门密封是否正常',checked:false},
+      {id:'i246',text:'厨房：橱柜开关顺滑，台面接缝打硅胶，水槽下方有无渗漏',checked:false},
+      {id:'i247',text:'验收工具：插座检测仪、空鼓锤（或硬币）、2米靠尺、手电筒、记号笔、手机录像',checked:false},
+      {id:'i248',text:'发现问题：用记号笔标注，整理书面整改清单，约定整改期限，整改后再次验收，通过才付尾款',checked:false},
+    ]},
+    {id:'s26',num:26,title:'甲醛检测与通风散味',tagline:'入住前必做，健康第一',tags:['⏱ 竣工后通风至少3个月','健康必须重视'],items:[
+      {id:'i250',text:'油漆地板完工后，关闭门窗24小时，请专业机构检测甲醛浓度（国标≤0.08mg/m³）',checked:false},
+      {id:'i251',text:'超标则继续通风：打开全部窗户对流通风，持续3个月以上',checked:false},
+      {id:'i252',text:'五层排屋体量大，每层都要充分通风，夏天温度高甲醛释放快，通风效果更好',checked:false},
+      {id:'i253',text:'新家具进场后同样释放甲醛，进场后继续通风',checked:false},
+      {id:'i254',text:'入住前再做一次专业检测，确认合格再搬入',checked:false},
+    ]},
+    {id:'s27',num:27,title:'退押金 & 资料归档',tagline:'装修资料妥善保管，日后维修和纠纷都要用到',tags:['⏱ 竣工后1周'],items:[
+      {id:'i260',text:'携带装修许可证和押金收据，到物业办理退押金手续',checked:false},
+      {id:'i261',text:'保存：所有合同、收据、发票（质保期维权用）',checked:false},
+      {id:'i262',text:'保存：水电走线照片（打钉挂东西时参考，否则可能打穿水管电线）',checked:false},
+      {id:'i263',text:'保存：各主材产品说明书、质保卡',checked:false},
+      {id:'i264',text:'记录所有工人和商家联系方式，分类整理',checked:false},
+      {id:'i265',text:'整理剩余备用材料（多余的砖、地板、乳胶漆），贴好标签存放备用',checked:false},
+    ]},
+    {id:'s28',num:28,title:'入住后磨合期注意事项',tagline:'住进去后还有很多小事需要处理',tags:['⏱ 入住后3个月内'],items:[
+      {id:'i270',text:'入住后1个月：再次检查所有插座开关，水路有无渗漏',checked:false},
+      {id:'i271',text:'新家地板和墙面经历热胀冷缩，可能出现轻微裂缝，属正常现象，联系施工方修补',checked:false},
+      {id:'i272',text:'橱柜、衣柜铰链和轨道可能需要调整，通常商家免费上门服务一次',checked:false},
+      {id:'i273',text:'质保期内任何问题，书面通知施工方，对方需在约定时间内处理',checked:false},
+      {id:'i274',text:'地漏每月清理一次，防止毛发堵塞',checked:false},
+      {id:'i275',text:'卫生间硅胶缝定期检查，发现黑斑及时清洁或重打',checked:false},
+    ]},
+  ]},
+];
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+const today=new Date();
+function days(d){return Math.ceil((new Date(d)-today)/86400000);}
+function fmt(n){return '¥'+Math.round(n).toLocaleString();}
+function tod(){return today.toISOString().slice(0,10);}
+function uid(){return 'i'+(NID++);}
+
+// ─── Main nav ─────────────────────────────────────────────────────────────────
+const PAGES=['budget','payment','progress','materials','log','guide','export'];
+function mainSw(name){
+  document.querySelectorAll('.main-tab').forEach((t,i)=>t.classList.toggle('active',PAGES[i]===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+}
+
+// ─── Budget ──────────────────────────────────────────────────────────────────
+function rBudget(){
+  const tb=S.budget.reduce((s,r)=>s+r.budget,0);
+  const tp=S.budget.reduce((s,r)=>s+r.paid,0);
+  const rem=tb-tp,pct=tb>0?Math.round(tp/tb*100):0;
+  const ov=S.budget.filter(r=>r.paid>r.budget).length;
+  document.getElementById('BM').innerHTML=`
+    <div class="metric"><div class="metric-label">总预算</div><div class="metric-value">${fmt(tb)}</div></div>
+    <div class="metric"><div class="metric-label">已支出</div><div class="metric-value ${tp>tb?'mv-bad':''}">${fmt(tp)}</div></div>
+    <div class="metric"><div class="metric-label">剩余预算</div><div class="metric-value ${rem<0?'mv-bad':'mv-ok'}">${fmt(rem)}</div></div>`;
+  const bar=document.getElementById('BPBAR');
+  bar.style.width=Math.min(pct,100)+'%';
+  bar.style.background=pct>100?'var(--red)':'var(--blue)';
+  document.getElementById('BPTXT').textContent=`已用 ${pct}% · ${ov>0?ov+' 项超支':'无超支项目'}`;
+  document.getElementById('BTBODY').innerHTML=S.budget.map(r=>{
+    const d=r.budget-r.paid,o=r.paid>r.budget;
+    const b=o?'<span class="badge bo">超支</span>':r.paid>=r.budget?'<span class="badge bd">完成</span>':r.paid>0?'<span class="badge bp">进行中</span>':'<span class="badge bn">未开始</span>';
+    return `<tr><td>${r.name}</td><td>${fmt(r.budget)}</td><td>${fmt(r.paid)}</td><td style="color:${o?'var(--red)':'var(--green)'}">${o?'-':'+'}${fmt(Math.abs(d))}</td><td>${b}</td><td><button class="del-btn" onclick="del('budget',${r.id})">×</button></td></tr>`;
+  }).join('');
+}
+function addB(){
+  const n=document.getElementById('BN').value.trim();if(!n)return;
+  S.budget.push({id:NID++,name:n,budget:parseFloat(document.getElementById('BB').value)||0,paid:parseFloat(document.getElementById('BP').value)||0});
+  ['BN','BB','BP'].forEach(id=>document.getElementById(id).value='');
+  rBudget();
+}
+
+// ─── Payments ────────────────────────────────────────────────────────────────
+function rPayment(){
+  const al=[];
+  S.payments.filter(r=>!r.paid).forEach(r=>{
+    const d=days(r.dueDate);
+    if(d<0) al.push(`<div class="alert alert-d">逾期未付：${r.name} ${fmt(r.amount)}（已逾期 ${Math.abs(d)} 天）</div>`);
+    else if(d<=7) al.push(`<div class="alert alert-w">即将到期：${r.name} ${fmt(r.amount)}（还剩 ${d} 天 · ${r.dueDate}）</div>`);
+  });
+  document.getElementById('PALERTS').innerHTML=al.join('');
+  document.getElementById('PTBODY').innerHTML=S.payments.map(r=>{
+    const d=days(r.dueDate);
+    const b=r.paid?'<span class="badge bd">已付</span>':d<0?'<span class="badge bo">已逾期</span>':d<=7?'<span class="badge bw">即将到期</span>':'<span class="badge bn">待付</span>';
+    const ck=r.paid?'':` <button class="btn-sm" onclick="markPaid(${r.id})">✓ 已付</button>`;
+    return `<tr><td>${r.name}</td><td>${fmt(r.amount)}</td><td style="color:${!r.paid&&d<0?'var(--red)':!r.paid&&d<=7?'var(--amber)':'inherit'}">${r.dueDate}</td><td style="color:var(--text2)">${r.note||''}</td><td>${b}</td><td style="display:flex;gap:4px;align-items:center">${ck}<button class="del-btn" onclick="del('payments',${r.id})">×</button></td></tr>`;
+  }).join('');
+}
+function markPaid(id){const r=S.payments.find(x=>x.id===id);if(r)r.paid=true;rPayment();}
+function addP(){
+  const n=document.getElementById('PN').value.trim();if(!n)return;
+  S.payments.push({id:NID++,name:n,amount:parseFloat(document.getElementById('PA').value)||0,dueDate:document.getElementById('PD').value||tod(),note:document.getElementById('PR').value,paid:false});
+  ['PN','PA','PD','PR'].forEach(id=>document.getElementById(id).value='');
+  rPayment();
+}
+
+// ─── Progress ────────────────────────────────────────────────────────────────
+function rProgress(){
+  const done=S.progress.filter(r=>r.status==='done').length;
+  const tot=S.progress.length,pct=tot>0?Math.round(done/tot*100):0;
+  document.getElementById('PGM').innerHTML=`<div class="metric"><div class="metric-label">总项目</div><div class="metric-value">${tot}</div></div><div class="metric"><div class="metric-label">已完成</div><div class="metric-value mv-ok">${done}</div></div><div class="metric"><div class="metric-label">完成率</div><div class="metric-value">${pct}%</div></div>`;
+  const sl={done:'已完成',progress:'进行中',pending:'待开始'},bc={done:'bd',progress:'bp',pending:'bn'};
+  document.getElementById('PGTBODY').innerHTML=S.progress.map(r=>`<tr><td>${r.name}</td><td style="color:var(--text2)">${r.worker}</td><td style="color:var(--text2)">${r.date}</td><td><span class="badge ${bc[r.status]}">${sl[r.status]}</span></td><td><button class="btn-sm" onclick="openPhotos('progress',${r.id},'${r.name}')">照片${r.photos.length?'('+r.photos.length+')':''}</button></td><td><button class="del-btn" onclick="del('progress',${r.id})">×</button></td></tr>`).join('');
+}
+function addPG(){
+  const n=document.getElementById('PGN').value.trim();if(!n)return;
+  S.progress.push({id:NID++,name:n,worker:document.getElementById('PGW').value||'-',date:document.getElementById('PGD').value||'-',status:document.getElementById('PGS').value,photos:[]});
+  ['PGN','PGW','PGD'].forEach(id=>document.getElementById(id).value='');
+  rProgress();
+}
+
+// ─── Materials ───────────────────────────────────────────────────────────────
+function rMaterials(){
+  const tot=S.materials.length,arr=S.materials.filter(r=>r.status==='arrived').length;
+  const amt=S.materials.reduce((s,r)=>s+(r.price||0),0);
+  document.getElementById('MM').innerHTML=`<div class="metric"><div class="metric-label">采购项</div><div class="metric-value">${tot} 项</div></div><div class="metric"><div class="metric-label">已到货</div><div class="metric-value mv-ok">${arr} 项</div></div><div class="metric"><div class="metric-label">采购总额</div><div class="metric-value">${fmt(amt)}</div></div>`;
+  const sl={arrived:'已到货',transit:'运输中',ordered:'已下单',notyet:'未下单'},bc={arrived:'bar',transit:'btr',ordered:'bor',notyet:'bno'};
+  document.getElementById('MTBODY').innerHTML=S.materials.map(r=>`<tr><td>${r.name}</td><td style="color:var(--text2)">${r.spec}</td><td style="color:var(--text2)">${r.qty}</td><td>${r.price?fmt(r.price):'-'}</td><td><span class="badge ${bc[r.status]}">${sl[r.status]}</span></td><td><button class="btn-sm" onclick="openPhotos('materials',${r.id},'${r.name}')">照片${r.photos.length?'('+r.photos.length+')':''}</button></td><td><button class="del-btn" onclick="del('materials',${r.id})">×</button></td></tr>`).join('');
+}
+function addM(){
+  const n=document.getElementById('MN').value.trim();if(!n)return;
+  S.materials.push({id:NID++,name:n,spec:document.getElementById('MS').value||'-',qty:document.getElementById('MQ').value||'-',price:parseFloat(document.getElementById('MP').value)||0,status:document.getElementById('MST').value,photos:[]});
+  ['MN','MS','MQ','MP'].forEach(id=>document.getElementById(id).value='');
+  rMaterials();
+}
+
+// ─── Logs ────────────────────────────────────────────────────────────────────
+function rLogs(){
+  const ac={我:'av-me',爸:'av-dad',妈:'av-mom'};
+  document.getElementById('LOGLIST').innerHTML=[...S.logs].reverse().map(r=>`
+    <div class="log-item">
+      <div class="log-av ${ac[r.who]||'av-me'}">${r.who}</div>
+      <div class="log-body">
+        <div class="log-text">${r.text}</div>
+        ${r.photos&&r.photos.length?`<div class="log-photos">${r.photos.map(p=>`<img src="${p}" class="lph" onclick="viewImg('${p}')"/>`).join('')}</div>`:''}
+        <div class="log-meta">${r.who} · ${r.date}</div>
+      </div>
+      <button class="del-btn" onclick="del('logs',${r.id})">×</button>
+    </div>`).join('');
+}
+function previewLogPh(e){
+  const files=Array.from(e.target.files);
+  const prev=document.getElementById('LOGPHPREV');prev.innerHTML='';logPhs=[];
+  files.forEach(f=>{const r=new FileReader();r.onload=ev=>{logPhs.push(ev.target.result);const img=document.createElement('img');img.src=ev.target.result;img.style.cssText='width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border)';prev.appendChild(img);document.getElementById('LOGPHC').textContent=logPhs.length+'张';};r.readAsDataURL(f);});
+}
+function addLog(){
+  const t=document.getElementById('LOGTXT').value.trim();if(!t)return;
+  S.logs.push({id:NID++,who:selWho,text:t,date:tod(),photos:[...logPhs]});
+  document.getElementById('LOGTXT').value='';document.getElementById('LOGPHPREV').innerHTML='';document.getElementById('LOGPHC').textContent='';document.getElementById('LOGPHI').value='';logPhs=[];
+  rLogs();
+}
+function selM(btn){document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selWho=btn.dataset.who;}
+
+// ─── Photos ──────────────────────────────────────────────────────────────────
+function openPhotos(type,id,name){
+  CUR={type,id};
+  document.getElementById('PH-TITLE').textContent=name+' — 照片备注';
+  renderPhGrid();
+  document.getElementById('PH-MASK').classList.add('open');
+}
+function renderPhGrid(){
+  if(!CUR)return;
+  const rec=S[CUR.type].find(r=>r.id===CUR.id);
+  const grid=document.getElementById('PH-GRID');
+  grid.innerHTML=(rec.photos||[]).map((p,i)=>`<div class="pthumb-wrap"><img src="${p}" class="pthumb" onclick="viewImg('${p}')"/><button class="pdel" onclick="delPhoto(${i})">×</button></div>`).join('');
+  const add=document.createElement('div');add.className='padd';add.innerHTML='<span style="font-size:24px">+</span><span>添加照片</span>';
+  add.onclick=()=>document.getElementById('PH-FILE').click();
+  grid.appendChild(add);
+}
+function delPhoto(i){const rec=S[CUR.type].find(r=>r.id===CUR.id);rec.photos.splice(i,1);renderPhGrid();rProgress();rMaterials();}
+function uploadPhotos(e){
+  const files=Array.from(e.target.files);
+  const rec=S[CUR.type].find(r=>r.id===CUR.id);
+  let done=0;
+  files.forEach(f=>{const r=new FileReader();r.onload=ev=>{rec.photos.push(ev.target.result);done++;if(done===files.length){renderPhGrid();rProgress();rMaterials();}};r.readAsDataURL(f);});
+  e.target.value='';
+}
+function closeMask(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+function viewImg(src){document.getElementById('LB-IMG').src=src;document.getElementById('LB').classList.add('open');}
+
+// ─── Generic del ─────────────────────────────────────────────────────────────
+function del(type,id){S[type]=S[type].filter(r=>r.id!==id);rAll();}
+function rAll(){rBudget();rPayment();rProgress();rMaterials();rLogs();}
+
+// ─── Guide rendering ─────────────────────────────────────────────────────────
+function buildGuide(){
+  const nav=document.getElementById('GNAV');
+  const main=document.getElementById('GUIDE_MAIN');
+  nav.innerHTML='';main.innerHTML='';
+
+  G.forEach((phase,pi)=>{
+    // Nav
+    const gp=document.createElement('div');
+    gp.innerHTML=`<div class="gn-phase">${phase.phase}</div>`;
+    phase.steps.forEach(step=>{
+      const a=document.createElement('a');
+      a.className='gn-item';a.href='#'+step.id;
+      a.innerHTML=`<span class="gn-num">${step.num}</span>${step.title}`;
+      gp.appendChild(a);
+    });
+    nav.appendChild(gp);
+
+    // Phase section
+    const sec=document.createElement('div');
+    sec.className='phase-sec '+phase.color;
+    sec.id='phase-'+pi;
+    sec.innerHTML=`<div class="phase-hdr"><div class="ph-icon">${phase.icon}</div><div><div class="ph-title">${phase.phase}</div></div><div class="ph-badge">${phase.badge}</div></div>`;
+
+    phase.steps.forEach(step=>{
+      const card=document.createElement('div');
+      card.className='step-card';card.id=step.id;
+
+      const tagHtml=step.tags.map(t=>{
+        const cls=t.includes('⏱')?'t-time':t.includes('⚠')||t.includes('重要')||t.includes('禁止')||t.includes('绝对')?'t-warn':t.includes('万')||t.includes('费用')||t.includes('金额')?'t-money':t.includes('自己')||t.includes('参与')?'t-diy':'t-tip';
+        return `<span class="tag ${cls}">${t}</span>`;
+      }).join('');
+
+      card.innerHTML=`
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-num-badge">${step.num}</div>
+          <div class="step-title-col">
+            <div class="step-title">${step.title}</div>
+            <div class="step-tagline">${step.tagline}</div>
+            <div class="step-tags">${tagHtml}</div>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body-wrap">
+          <div class="blk">
+            <div class="blk-title">操作清单 <span style="font-size:10px;font-weight:400;color:var(--text3)">（点击文字可编辑，勾选可标记完成）</span></div>
+            <ul class="ecl" id="ecl-${step.id}"></ul>
+            <div class="add-item-row">
+              <input class="add-item-inp" id="inp-${step.id}" placeholder="新增条目..."/>
+              <button class="btn" onclick="addItem('${step.id}')">+ 添加</button>
+            </div>
+          </div>
+        </div>`;
+      sec.appendChild(card);
+      renderEcl(step.id,step.items);
+    });
+    main.appendChild(sec);
+  });
+}
+
+function renderEcl(stepId,items){
+  const ul=document.getElementById('ecl-'+stepId);
+  if(!ul)return;
+  ul.innerHTML=items.map((item,idx)=>`
+    <li class="ecl-item">
+      <input type="checkbox" class="ecl-check" ${item.checked?'checked':''} onchange="toggleItem('${stepId}',${idx},this.checked)"/>
+      <textarea class="ecl-text" rows="1" oninput="autoResize(this);updateItem('${stepId}',${idx},this.value)">${item.text}</textarea>
+      <button class="ecl-del" onclick="removeItem('${stepId}',${idx})" title="删除">×</button>
+    </li>`).join('');
+  // auto resize all textareas
+  ul.querySelectorAll('.ecl-text').forEach(t=>autoResize(t));
+}
+
+function autoResize(ta){
+  ta.style.height='auto';
+  ta.style.height=ta.scrollHeight+'px';
+}
+
+function findStep(stepId){
+  for(const phase of G)for(const step of phase.steps)if(step.id===stepId)return step;
+  return null;
+}
+
+function toggleItem(stepId,idx,checked){
+  const step=findStep(stepId);
+  if(step)step.items[idx].checked=checked;
+}
+function updateItem(stepId,idx,text){
+  const step=findStep(stepId);
+  if(step)step.items[idx].text=text;
+}
+function removeItem(stepId,idx){
+  const step=findStep(stepId);
+  if(!step)return;
+  step.items.splice(idx,1);
+  renderEcl(stepId,step.items);
+}
+function addItem(stepId){
+  const inp=document.getElementById('inp-'+stepId);
+  const text=inp.value.trim();if(!text)return;
+  const step=findStep(stepId);
+  if(!step)return;
+  step.items.push({id:uid(),text,checked:false});
+  inp.value='';
+  renderEcl(stepId,step.items);
+}
+
+function toggleStep(hdr){
+  const body=hdr.nextElementSibling;
+  const icon=hdr.querySelector('.step-toggle');
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  icon.classList.toggle('open',!open);
+}
+function expandAll(){
+  document.querySelectorAll('.step-body-wrap').forEach(b=>b.classList.add('open'));
+  document.querySelectorAll('.step-toggle').forEach(i=>i.classList.add('open'));
+}
+function collapseAll(){
+  document.querySelectorAll('.step-body-wrap').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.step-toggle').forEach(i=>i.classList.remove('open'));
+}
+
+// ─── Export ──────────────────────────────────────────────────────────────────
+function dl(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();document.getElementById('EXPMSG').textContent=name+' 已下载 ✓';}
+function expBudget(){
+  const tb=S.budget.reduce((s,r)=>s+r.budget,0),tp=S.budget.reduce((s,r)=>s+r.paid,0);
+  let c='分类,预算,已付,差额,状态\n';
+  S.budget.forEach(r=>{const d=r.budget-r.paid;const st=r.paid>r.budget?'超支':r.paid>=r.budget?'完成':r.paid>0?'进行中':'未开始';c+=`${r.name},${r.budget},${r.paid},${d},${st}\n`;});
+  c+=`合计,${tb},${tp},${tb-tp},\n`;
+  dl('装修预算报表.csv','\uFEFF'+c,'text/csv');
+}
+function expPayment(){
+  let c='付款事项,金额,截止日期,备注,状态\n';
+  S.payments.forEach(r=>{const s=r.paid?'已付':days(r.dueDate)<0?'已逾期':'待付';c+=`${r.name},${r.amount},${r.dueDate},${r.note||''},${s}\n`;});
+  dl('付款节点.csv','\uFEFF'+c,'text/csv');
+}
+function expProgress(){
+  let c='施工项目,负责方,计划完成,状态,照片数\n';
+  const sl={done:'已完成',progress:'进行中',pending:'待开始'};
+  S.progress.forEach(r=>c+=`${r.name},${r.worker},${r.date},${sl[r.status]},${r.photos.length}\n`);
+  dl('施工进度.csv','\uFEFF'+c,'text/csv');
+}
+function expFull(){
+  const tb=S.budget.reduce((s,r)=>s+r.budget,0),tp=S.budget.reduce((s,r)=>s+r.paid,0);
+  const slpg={done:'已完成',progress:'进行中',pending:'待开始'};
+  const slm={arrived:'已到货',transit:'运输中',ordered:'已下单',notyet:'未下单'};
+  const h=`<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><title>装修管理报告</title>
+<style>body{font-family:system-ui,'PingFang SC',sans-serif;max-width:820px;margin:40px auto;padding:0 24px;color:#1a1a1a;font-size:14px}
+h1{font-size:22px;font-weight:700;margin-bottom:4px}.meta{color:#888;font-size:13px;margin-bottom:32px}
+h2{font-size:16px;font-weight:600;margin:28px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+th{text-align:left;padding:8px 10px;background:#f5f5f5;font-weight:500;font-size:12px}
+td{padding:9px 10px;border-bottom:1px solid #eee}
+.ok{color:#2d6a1f}.bad{color:#991f1f}.warn{color:#7a4500}.sum{font-weight:600;background:#f9f9f9}
+.li{border-left:3px solid #ddd;padding:8px 12px;margin-bottom:10px;font-size:13px;line-height:1.6}
+.lm{font-size:11px;color:#888;margin-top:3px}
+</style></head><body>
+<h1>悦望名邸装修管理报告</h1>
+<div class="meta">生成时间：${new Date().toLocaleString('zh-CN')} · 五层排屋 162㎡ · 半包</div>
+<h2>预算总览</h2><table><tr><th>分类</th><th>预算</th><th>已付</th><th>差额</th><th>状态</th></tr>
+${S.budget.map(r=>{const d=r.budget-r.paid;const o=r.paid>r.budget;return`<tr><td>${r.name}</td><td>¥${r.budget.toLocaleString()}</td><td>¥${r.paid.toLocaleString()}</td><td class="${o?'bad':'ok'}">${o?'-':'+'}¥${Math.abs(d).toLocaleString()}</td><td class="${o?'bad':r.paid>=r.budget?'ok':'warn'}">${o?'超支':r.paid>=r.budget?'完成':r.paid>0?'进行中':'未开始'}</td></tr>`;}).join('')}
+<tr class="sum"><td>合计</td><td>¥${tb.toLocaleString()}</td><td>¥${tp.toLocaleString()}</td><td class="${tp>tb?'bad':'ok'}">${tp>tb?'-':'+'}¥${Math.abs(tb-tp).toLocaleString()}</td><td></td></tr></table>
+<h2>付款节点</h2><table><tr><th>事项</th><th>金额</th><th>截止日期</th><th>备注</th><th>状态</th></tr>
+${S.payments.map(r=>{const d=days(r.dueDate);return`<tr><td>${r.name}</td><td>¥${r.amount.toLocaleString()}</td><td>${r.dueDate}</td><td>${r.note||''}</td><td class="${r.paid?'ok':d<0?'bad':'warn'}">${r.paid?'已付':d<0?'逾期':'待付'}</td></tr>`;}).join('')}</table>
+<h2>施工进度</h2><table><tr><th>项目</th><th>负责方</th><th>计划完成</th><th>状态</th></tr>
+${S.progress.map(r=>`<tr><td>${r.name}</td><td>${r.worker}</td><td>${r.date}</td><td class="${r.status==='done'?'ok':r.status==='progress'?'warn':''}">${slpg[r.status]}</td></tr>`).join('')}</table>
+<h2>材料采购</h2><table><tr><th>材料</th><th>规格</th><th>数量</th><th>金额</th><th>状态</th></tr>
+${S.materials.map(r=>`<tr><td>${r.name}</td><td>${r.spec}</td><td>${r.qty}</td><td>${r.price?'¥'+r.price.toLocaleString():'-'}</td><td>${slm[r.status]}</td></tr>`).join('')}</table>
+<h2>沟通记录</h2>${[...S.logs].reverse().map(r=>`<div class="li">${r.text}<div class="lm">${r.who} · ${r.date}</div></div>`).join('')}
+</body></html>`;
+  dl('装修管理报告.html',h,'text/html');
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+rAll();
+buildGuide();
+</script>
+</body>
+</html>
