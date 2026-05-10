@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>装修管理平台 · 悦望名邸</title>
+<title>装修管理平台</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -240,7 +240,7 @@ textarea:focus{border-color:var(--green);}
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="app-title">悦望名邸装修管理<span class="app-sub">五层排屋 · 162㎡ · 半包</span></div>
+    <div class="app-title">装修管理<span class="app-sub"></span></div>
     <div class="main-tabs">
       <button class="main-tab active" onclick="mainSw('budget')">预算</button>
       <button class="main-tab" onclick="mainSw('payment')">付款提醒</button>
@@ -1011,7 +1011,7 @@ td{padding:9px 10px;border-bottom:1px solid #eee}
 .li{border-left:3px solid #ddd;padding:8px 12px;margin-bottom:10px;font-size:13px;line-height:1.6}
 .lm{font-size:11px;color:#888;margin-top:3px}
 </style></head><body>
-<h1>悦望名邸装修管理报告</h1>
+<h1>装修管理报告</h1>
 <div class="meta">生成时间：${new Date().toLocaleString('zh-CN')} · 五层排屋 162㎡ · 半包</div>
 <h2>预算总览</h2><table><tr><th>分类</th><th>预算</th><th>已付</th><th>差额</th><th>状态</th></tr>
 ${S.budget.map(r=>{const d=r.budget-r.paid;const o=r.paid>r.budget;return`<tr><td>${r.name}</td><td>¥${r.budget.toLocaleString()}</td><td>¥${r.paid.toLocaleString()}</td><td class="${o?'bad':'ok'}">${o?'-':'+'}¥${Math.abs(d).toLocaleString()}</td><td class="${o?'bad':r.paid>=r.budget?'ok':'warn'}">${o?'超支':r.paid>=r.budget?'完成':r.paid>0?'进行中':'未开始'}</td></tr>`;}).join('')}
